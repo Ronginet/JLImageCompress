@@ -25,7 +25,7 @@
 }
 
 + (UIImage *)jl_compressWithImage:(NSData *)imageData specifySize:(CGFloat)size {
-    CGFloat specifySize = size * 1024 * 1024;
+    CGFloat specifySize = size * 1000 * 1000;
     
     JLImageFormat imageFormat = [NSData jl_imageFormatWithImageData:imageData];
     if (imageFormat == JLImageFormatPNG) {
