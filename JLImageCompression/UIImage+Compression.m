@@ -11,6 +11,10 @@
 @implementation UIImage (Compression)
 
 + (UIImage *)jl_compressWithImage:(UIImage *)image imageType:(JLImageFormat)imageType specifySize:(CGFloat)size {
+    if (size == 0) {
+        return image;
+    }
+    
     if (imageType == JLImageFormatPNG) {
         NSData *data = UIImagePNGRepresentation(image);
         return [self jl_compressWithImage:data specifySize:size];
@@ -25,6 +29,10 @@
 }
 
 + (UIImage *)jl_compressWithImage:(NSData *)imageData specifySize:(CGFloat)size {
+    if (!imageData || size == 0) {
+        return nil;
+    }
+    
     CGFloat specifySize = size * 1000 * 1000;
     
     JLImageFormat imageFormat = [NSData jl_imageFormatWithImageData:imageData];
