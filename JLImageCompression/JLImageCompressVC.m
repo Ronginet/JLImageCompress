@@ -75,22 +75,15 @@
             data = [NSData dataWithContentsOfFile:path];
             self.presiousSizeLabel.text = [NSString stringWithFormat:@"压缩前:%.2fMB",data.length / 1000.0 / 1000.0];
             
-            
             CGImageSourceRef imageRef = CGImageSourceCreateWithData((CFDataRef)data, nil);
             NSInteger count = CGImageSourceGetCount(imageRef);
             NSMutableArray<UIImage *> *images = [NSMutableArray array];
-//            CGFloat duration = 0.0;
-            for (int i=0; i<count; i++) {
+            for (int i = 0; i < count; i++) {
                 CGImageRef image = CGImageSourceCreateImageAtIndex(imageRef, i, NULL);
-//                duration = [self sd_frameDurationAtIndex:i source:imageRef];
                 [images addObject:[UIImage imageWithCGImage:image]];
                 CGImageRelease(image);
             }
-//            self.imageView.animationImages = images;
-//            self.imageView.animationDuration = 1.0 / count;
-//            self.imageView.animationRepeatCount = 0;
-            self.imageView.image = [UIImage animatedImageWithImages:images duration:1.0/20 *count];
-            return ;
+            self.imageView.image = [UIImage animatedImageWithImages:images duration:1.0/20 * count];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -98,39 +91,6 @@
             self.presiousSizeLabel.text = [NSString stringWithFormat:@"压缩前:%.2fMB",data.length / 1000.0 / 1000.0];
         });
     });
-}
-
-- (float)sd_frameDurationAtIndex:(NSUInteger)index source:(CGImageSourceRef)source {
-    float frameDuration = 0.1f;
-    // 获取这一帧的属性字典
-    CFDictionaryRef cfFrameProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil);
-    NSDictionary *frameProperties = (__bridge NSDictionary *)cfFrameProperties;
-    NSDictionary *gifProperties = frameProperties[(NSString *)kCGImagePropertyGIFDictionary];
-    
-    // 从字典中获取这一帧持续的时间
-    NSNumber *delayTimeUnclampedProp = gifProperties[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
-    if (delayTimeUnclampedProp) {
-        frameDuration = [delayTimeUnclampedProp floatValue];
-    }
-    else {
-        
-        NSNumber *delayTimeProp = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
-        if (delayTimeProp) {
-            frameDuration = [delayTimeProp floatValue];
-        }
-    }
-    
-    // Many annoying ads specify a 0 duration to make an image flash as quickly as possible.
-    // We follow Firefox's behavior and use a duration of 100 ms for any frames that specify
-    // a duration of <= 10 ms. See <rdar://problem/7689300> and <http://webkit.org/b/36082>
-    // for more information.
-    
-    if (frameDuration < 0.011f) {
-        frameDuration = 0.100f;
-    }
-    
-    CFRelease(cfFrameProperties);
-    return frameDuration;
 }
 
 - (void)compressionBtnClicked:(UIButton *)btn {
