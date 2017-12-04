@@ -7,6 +7,7 @@
 //
 
 #import "UIImage+Compression.h"
+#import <ImageIO/ImageIO.h>
 
 @implementation UIImage (Compression)
 
@@ -58,6 +59,35 @@
             image = [UIImage imageWithData:imageData scale:[UIScreen mainScreen].scale];
         }
         return image;
+    }
+    
+    if (imageFormat == JLImageFormatGIF) {
+        CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, NULL);
+        size_t count = CGImageSourceGetCount(source);
+        NSTimeInterval duration = count * (1 / 30.0);
+        NSMutableArray<UIImage *> *images = [NSMutableArray array];
+        for (size_t i = 0; i < count; i++) {
+            CGImageRef cgImage = CGImageSourceCreateImageAtIndex(source, i, NULL);
+            UIImage *image = [UIImage imageWithCGImage:cgImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
+            [images addObject:image];
+            CGImageRelease(cgImage);
+        }
+        CFRelease(source);
+        
+        while (imageData.length > size) {
+            for (UIImage *image in images) {
+                UIImage *img = image;
+                CGFloat targetWidth = img.size.width * 0.9;
+                CGFloat targetHeight = img.size.height * 0.9;
+                CGRect maxRect = CGRectMake(0, 0, targetWidth, targetHeight);
+                UIGraphicsBeginImageContextWithOptions(CGSizeMake(floorf(targetWidth), floorf(targetHeight)), NO, [UIScreen mainScreen].scale);
+                [img drawInRect:maxRect];
+                img = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                imageData = UIImagePNGRepresentation(img);
+            }
+        }
+        return [UIImage animatedImageWithImages:images duration:duration];
     }
     
     return [UIImage imageWithData:imageData];

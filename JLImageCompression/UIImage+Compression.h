@@ -12,7 +12,7 @@
 @interface UIImage (Compression)
 
 /**
- 压缩图片
+ 压缩图片,压缩 JPEG,PNG, 不含 GIF
 
  @param image 压缩前的图片
  @param imageType 指明图片类型
@@ -22,7 +22,7 @@
 + (UIImage *)jl_compressWithImage:(UIImage *)image imageType:(JLImageFormat)imageType specifySize:(CGFloat)size;
 
 /**
- 压缩图片
+ 压缩图片,压缩 JPEG,PNG,GIF
 
  @param imageData 压缩前图片的data
  @param size 期望压缩后的大小,单位:MB
